@@ -71,8 +71,8 @@ function generate_grid() {
 	const template_hexagon = document.querySelector("#hex-template");
 	const grid_container = document.querySelector(".hex-container");
 
-	for (let j = 1; j <= 30; j++) {
-		for (let i = 1; i <= 30; i++) {
+	for (let j = 1; j <= 7; j++) {
+		for (let i = 1; i <= 7; i++) {
 			const hexagon = template_hexagon.content.cloneNode(true).firstChild;
 			hexagon.setAttribute("data-position", `${j}-${i}`);
 			hexagon.addEventListener("click", select_hexagon);

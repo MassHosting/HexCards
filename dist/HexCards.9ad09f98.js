@@ -117,229 +117,79 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"scripts/navbar.js":[function(require,module,exports) {
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+})({"node_modules/parcel/src/builtins/bundle-url.js":[function(require,module,exports) {
+var bundleURL = null;
 
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function getBundleURLCached() {
+  if (!bundleURL) {
+    bundleURL = getBundleURL();
+  }
 
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+  return bundleURL;
+}
 
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+function getBundleURL() {
+  // Attempt to find the URL of the current script and use that as the base URL
+  try {
+    throw new Error();
+  } catch (err) {
+    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
 
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-var DECKS = {
-  prvi_dek: ["https://picsum.photos/300", "https://picsum.photos/200", "https://picsum.photos/200", "https://picsum.photos/200"],
-  drugi_dek: ["https://picsum.photos/200", "https://picsum.photos/200", "https://picsum.photos/200", "https://picsum.photos/200"]
-};
-
-function tab_setup() {
-  var window_hash = window.location.hash;
-  if (!window_hash) window_hash = "#nav-decks";
-  var clicked_tab = document.querySelector("[href='".concat(window_hash, "']"));
-  document.querySelectorAll(".nav-link").forEach(function (element) {
-    if (clicked_tab === element) {
-      element.classList.add("active");
-    } else {
-      element.classList.remove("active");
+    if (matches) {
+      return getBaseURL(matches[0]);
     }
-  });
-  document.querySelectorAll(".tab-container").forEach(function (element) {
-    if (element.getAttribute("data-hash") === window_hash) {
-      element.classList.remove("d-none");
-    } else {
-      element.classList.add("d-none");
-    }
-  });
-}
-
-function select_deck(event) {
-  var clicked_link = event.target;
-
-  if (clicked_link.classList.contains("active")) {
-    clicked_link.classList.remove("active");
-  } else {
-    clicked_link.classList.add("active");
   }
 
-  var selected_cards = [];
-  document.querySelectorAll(".list-group-item.active").forEach(function (element) {
-    selected_cards.push.apply(selected_cards, _toConsumableArray(DECKS[element.innerHTML]));
-  });
-  build_cards(selected_cards);
+  return '/';
 }
 
-function build_cards(selected_cards) {
-  var cards_container = document.querySelector(".container-cards");
-  var template_hexagon = document.querySelector("#hex-template");
-  Array.from(cards_container.querySelectorAll(".hex:not(.first)")).slice(1).forEach(function (element) {
-    element.remove();
-  });
-  selected_cards.forEach(function (card_url) {
-    var hexagon = template_hexagon.content.cloneNode(true).firstChild;
-    hexagon.addEventListener("click", function () {
-      cards_container.dispatchEvent(new CustomEvent("cardSelect", {
-        detail: {
-          image_url: card_url
-        }
-      }));
-    });
-    hexagon.style.backgroundImage = "url(\"".concat(card_url, "\")");
-    cards_container.appendChild(hexagon);
-  });
+function getBaseURL(url) {
+  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)\/[^/]+$/, '$1') + '/';
 }
 
-function setup_decks() {
-  var deck_list_template = document.querySelector("#deck-list-template");
-  var deck_list = document.querySelector(".container-decks");
-  Object.keys(DECKS).forEach(function (deck_name) {
-    var new_deck_list_item = deck_list_template.content.cloneNode(true).firstChild;
-    new_deck_list_item.innerHTML = deck_name;
-    deck_list.appendChild(new_deck_list_item);
-  });
-  var list_group_links = document.querySelectorAll(".list-group.tab-container>div");
-  list_group_links.forEach(function (element) {
-    element.addEventListener("click", select_deck);
-  });
+exports.getBundleURL = getBundleURLCached;
+exports.getBaseURL = getBaseURL;
+},{}],"node_modules/parcel/src/builtins/css-loader.js":[function(require,module,exports) {
+var bundle = require('./bundle-url');
+
+function updateLink(link) {
+  var newLink = link.cloneNode();
+
+  newLink.onload = function () {
+    link.remove();
+  };
+
+  newLink.href = link.href.split('?')[0] + '?' + Date.now();
+  link.parentNode.insertBefore(newLink, link.nextSibling);
 }
 
-exports.setup_decks = setup_decks;
-exports.tab_setup = tab_setup;
-},{}],"scripts/grid.js":[function(require,module,exports) {
-var grid_state = {
-  data: {},
-  add_card: function add_card(card_pos, image_url) {
-    this.data[card_pos] = image_url;
-  },
-  remove_card: function remove_card(card_pos) {
-    delete this.data[card_pos];
-  },
-  store: function store() {
-    window.localStorage.setItem("hex_grid_map", JSON.stringify(this.data));
-  },
-  restore: function restore() {
-    var _this = this;
+var cssTimeout = null;
 
-    this.data = JSON.parse(window.localStorage.getItem("hex_grid_map") || "{}");
-    console.log(this.data);
-    Object.keys(this.data).forEach(function (hex_position) {
-      var hex = document.querySelector("[data-position=\"".concat(hex_position, "\"]"));
-      hex.style.backgroundImage = "url(\"".concat(_this.data[hex_position], "\")");
-    });
-  },
-  clear: function clear() {
-    this.data = {};
-  }
-};
-
-function select_hexagon(event) {
-  var selected_hex = document.querySelector(".hex-container>.hex.bg-primary");
-
-  if (selected_hex) {
-    selected_hex.classList.remove("bg-primary");
-    selected_hex.classList.add("bg-light");
-  }
-
-  var new_select = event.target;
-  new_select.classList.add("bg-primary");
-  new_select.classList.remove("bg-light");
-}
-
-function fill_hexagon(image_url) {
-  var selected_hex = document.querySelector(".hex-container>.hex.bg-primary");
-
-  if (!selected_hex) {
+function reloadCSS() {
+  if (cssTimeout) {
     return;
   }
 
-  selected_hex.style.backgroundImage = "url(\"".concat(image_url, "\")");
-  grid_state.add_card(selected_hex.getAttribute("data-position"), image_url);
-}
+  cssTimeout = setTimeout(function () {
+    var links = document.querySelectorAll('link[rel="stylesheet"]');
 
-function empty_hexagon() {
-  var selected_hex = document.querySelector(".hex-container>.hex.bg-primary");
-
-  if (!selected_hex) {
-    return;
-  }
-
-  selected_hex.style.backgroundImage = "";
-  var hex_pos = selected_hex.getAttribute("data-position");
-  grid_state.remove_card(hex_pos);
-}
-
-function generate_grid() {
-  var template_hexagon = document.querySelector("#hex-template");
-  var grid_container = document.querySelector(".hex-container");
-
-  for (var j = 1; j <= 7; j++) {
-    for (var i = 1; i <= 7; i++) {
-      var hexagon = template_hexagon.content.cloneNode(true).firstChild;
-      hexagon.setAttribute("data-position", "".concat(j, "-").concat(i));
-      hexagon.addEventListener("click", select_hexagon);
-      hexagon.style.gridRowStart = j;
-      if (j % 2 == 1) hexagon.style.gridColumn = "".concat(i * 2, " / span 2");else hexagon.style.gridColumn = "".concat(i * 2 - 1, " / span 2");
-      grid_container.appendChild(hexagon);
+    for (var i = 0; i < links.length; i++) {
+      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
+        updateLink(links[i]);
+      }
     }
-  }
+
+    cssTimeout = null;
+  }, 50);
 }
 
-exports.generate_grid = generate_grid;
-exports.fill_hexagon = fill_hexagon;
-exports.grid_state = grid_state;
-exports.empty_hexagon = empty_hexagon;
-},{}],"app.js":[function(require,module,exports) {
-var _require = require("./scripts/navbar"),
-    setup_decks = _require.setup_decks,
-    tab_setup = _require.tab_setup;
+module.exports = reloadCSS;
+},{"./bundle-url":"node_modules/parcel/src/builtins/bundle-url.js"}],"index.css":[function(require,module,exports) {
+var reloadCSS = require('_css_loader');
 
-var _require2 = require("./scripts/grid"),
-    generate_grid = _require2.generate_grid,
-    fill_hexagon = _require2.fill_hexagon,
-    grid_state = _require2.grid_state,
-    empty_hexagon = _require2.empty_hexagon;
-
-var DEFAULT_HEX_WIDTH = 240;
-var DEFAULT_HEX_HEIGHT = 265;
-var DEFAULT_GRID_AUTO_ROWS = 200;
-
-function zoom_grid(scale) {
-  var hexes = document.querySelectorAll(".hex-container>.hex");
-  hexes.forEach(function (hex) {
-    hex.style.width = "".concat(DEFAULT_HEX_WIDTH * scale, "px");
-    hex.style.height = "".concat(DEFAULT_HEX_HEIGHT * scale, "px");
-  });
-  var grid_container = document.querySelector(".hex-container");
-  grid_container.style.gridAutoRows = "".concat(DEFAULT_GRID_AUTO_ROWS * scale, "px");
-}
-
-document.querySelector(".container-cards").addEventListener("cardSelect", function (event) {
-  var image_url = event.detail.image_url;
-  fill_hexagon(image_url);
-});
-generate_grid();
-tab_setup();
-setup_decks();
-grid_state.restore();
-window.addEventListener("hashchange", tab_setup);
-window.addEventListener("beforeunload", function () {
-  return grid_state.store();
-});
-document.querySelector(".scale-select").addEventListener("change", function (event) {
-  var scale_size = Number(event.target.value);
-  console.log(scale_size);
-  zoom_grid(scale_size);
-});
-document.querySelector(".hex-delete").addEventListener("click", function () {
-  empty_hexagon();
-});
-document.querySelector(".cards-tools>button").addEventListener("click", function () {
-  grid_state.clear();
-  location.reload();
-});
-},{"./scripts/navbar":"scripts/navbar.js","./scripts/grid":"scripts/grid.js"}],"node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+module.hot.dispose(reloadCSS);
+module.hot.accept(reloadCSS);
+},{"_css_loader":"node_modules/parcel/src/builtins/css-loader.js"}],"node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -543,5 +393,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["node_modules/parcel/src/builtins/hmr-runtime.js","app.js"], null)
-//# sourceMappingURL=/app.c328ef1a.js.map
+},{}]},{},["node_modules/parcel/src/builtins/hmr-runtime.js"], null)
+//# sourceMappingURL=/HexCards.9ad09f98.js.map
