@@ -1,19 +1,3 @@
-const DECKS = {
-	prvi_dek: [
-		"https://picsum.photos/300",
-		"https://picsum.photos/200",
-		"https://picsum.photos/200",
-		"https://picsum.photos/200",
-	],
-	drugi_dek: [
-		"https://picsum.photos/200",
-		"https://picsum.photos/200",
-		"https://picsum.photos/200",
-		"https://picsum.photos/200",
-	],
-};
-
-
 function tab_setup() {
 	let window_hash = window.location.hash;
 	if (!window_hash) window_hash = "#nav-decks";
@@ -37,21 +21,23 @@ function tab_setup() {
 	});
 }
 
-function select_deck(event) {
-	const clicked_link = event.target;
+function generate_select_deck(DECKS) {
+	return function(event) {
+		const clicked_link = event.target;
 
-	if (clicked_link.classList.contains("active")) {
-		clicked_link.classList.remove("active");
-	} else {
-		clicked_link.classList.add("active");
+		if (clicked_link.classList.contains("active")) {
+			clicked_link.classList.remove("active");
+		} else {
+			clicked_link.classList.add("active");
+		}
+
+		const selected_cards = [];
+		document.querySelectorAll(".list-group-item.active").forEach((element) => {
+			selected_cards.push(...DECKS[element.innerHTML]);
+		});
+
+		build_cards(selected_cards);
 	}
-
-	const selected_cards = [];
-	document.querySelectorAll(".list-group-item.active").forEach((element) => {
-		selected_cards.push(...DECKS[element.innerHTML]);
-	});
-
-	build_cards(selected_cards);
 }
 
 
@@ -79,7 +65,7 @@ function build_cards(selected_cards) {
 }
 
 
-function setup_decks() {
+function setup_decks(DECKS) {
 	const deck_list_template = document.querySelector("#deck-list-template");
 	const deck_list = document.querySelector(".container-decks");
 
@@ -95,10 +81,39 @@ function setup_decks() {
 		".list-group.tab-container>div"
 	);
 
+	const select_deck = generate_select_deck(DECKS)
 	list_group_links.forEach((element) => {
 		element.addEventListener("click", select_deck);
 	});
 }
 
+function click_colapse_sidebar_generator() {
+	let is_colapsed = false;
+	const sidebar = document.querySelector(".col-cards")
+	const colapse_button = document.querySelector(".btn-colapse")
+	const open_button = document.querySelector(".btn-open");
+	
+	return function() {
+		!is_colapsed ? 
+			colapse_sidebar(sidebar, open_button, colapse_button) : 
+			open_sidebar(sidebar, open_button, colapse_button) 
+		is_colapsed = !is_colapsed;
+	}
+}
+
+function colapse_sidebar(sidebar, open_button, colapse_button) {
+	sidebar.style.display = "none";
+	colapse_button.style.display = "none";
+	open_button.style.removeProperty("display");
+}
+
+function open_sidebar(sidebar, open_button, colapse_button) {
+	sidebar.style.removeProperty("display");
+	open_button.style.display = "none";
+	colapse_button.style.removeProperty("display");
+}
+
+
 exports.setup_decks = setup_decks;
 exports.tab_setup = tab_setup;
+exports.click_colapse_sidebar_generator = click_colapse_sidebar_generator;

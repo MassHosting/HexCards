@@ -71,15 +71,15 @@ function generate_grid() {
 	const template_hexagon = document.querySelector("#hex-template");
 	const grid_container = document.querySelector(".hex-container");
 
-	for (let j = 1; j <= 7; j++) {
-		for (let i = 1; i <= 7; i++) {
+	for (let j = 1; j <= 12; j++) {
+		for (let i = 1; i <= 12; i++) {
 			const hexagon = template_hexagon.content.cloneNode(true).firstChild;
 			hexagon.setAttribute("data-position", `${j}-${i}`);
 			hexagon.addEventListener("click", select_hexagon);
 			hexagon.style.gridRowStart = j;
 
-			if (j % 2 == 1) hexagon.style.gridColumn = `${i * 2} / span 2`;
-			else hexagon.style.gridColumn = `${i * 2 - 1} / span 2`;
+			if (j % 2 == 1) hexagon.style.gridRow = `${i * 2} / span 2`;
+			else hexagon.style.gridRow = `${i * 2 - 1} / span 2`;
 
 			grid_container.appendChild(hexagon);
 		}
