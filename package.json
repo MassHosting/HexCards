@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-	"start": "npx serve ./dist",
-	"build": "npx parcel build ./index.html"
+    "test": "npx parcel ./index.html",
+    "start": "npx serve ./dist",
+    "build": "npx parcel build ./index.html"
   },
   "author": "",
   "license": "ISC",
@@ -16,5 +16,8 @@
     "prettier": "^2.1.2",
     "sass": "^1.26.11",
     "serve": "^11.3.2"
+  },
+  "dependencies": {
+    "request": "^2.88.2"
   }
 }
